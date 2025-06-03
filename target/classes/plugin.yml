@@ -1,0 +1,43 @@
+name: EmMCHelper
+version: 1.0.0 # This will be replaced by Maven with the version from pom.xml
+main: com.emuyia.emmchelper.MCHelperPlugin # IMPORTANT: Corrected to your actual main class path
+api-version: '1.21' # Set to your target Minecraft version (e.g., 1.19, 1.20, 1.21)
+author: emuyia # Your name or alias
+description: Allows players to reset their origin with a cooldown and XP cost.
+
+commands:
+  requestoriginreset:
+    description: Request to reset your origin.
+    usage: /<command>
+    aliases: [resetmyorigin, clearoriginreq] # Skript aliases were /resetmyorigin, /clearorigin
+    permission: emmc_resetorigin.request
+  confirmoriginreset:
+    description: Confirm your origin reset.
+    usage: /<command>
+    permission: emmc_resetorigin.confirm
+  canceloriginreset:
+    description: Cancel your pending origin reset.
+    usage: /<command>
+    permission: emmc_resetorigin.cancel
+  originresetcooldown:
+    description: Check your origin reset cooldown.
+    usage: /<command>
+    aliases: [myresetcooldown]
+    permission: emmc_resetorigin.cooldowncheck
+
+permissions:
+  emmc_resetorigin.request:
+    description: Allows requesting an origin reset.
+    default: true
+  emmc_resetorigin.confirm:
+    description: Allows confirming an origin reset.
+    default: true
+  emmc_resetorigin.cancel:
+    description: Allows cancelling an origin reset.
+    default: true
+  emmc_resetorigin.cooldowncheck:
+    description: Allows checking the origin reset cooldown.
+    default: true
+  emmc_resetorigin.admin.resetcooldown: # Optional admin command
+    description: Allows admins to reset a player's cooldown.
+    default: op

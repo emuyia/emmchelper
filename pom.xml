@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.emuyia.emmchelper</groupId> <!-- Change com.yourname -->
-    <artifactId>EMMC_ResetOrigin</artifactId>
+    <artifactId>emMCHelper</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>EmMCHelper</name>
+    <name>emMCHelper</name>
     <description>Plugin to allow players to reset their origin with a cooldown and XP cost.</description>
 
     <properties>

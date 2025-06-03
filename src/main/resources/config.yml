@@ -1,0 +1,26 @@
+# Configuration for emMCHelper
+
+# The cost in XP levels to reset the origin.
+xp-cost: 30
+
+# The cooldown duration in seconds before a player can reset their origin again.
+# Default is 86400 seconds (1 day).
+# Examples:
+# 3600 = 1 hour
+# 86400 = 1 day
+# 604800 = 1 week
+reset-cooldown-seconds: 86400
+
+# The command template that will be executed by the console to clear the player's origin.
+# %player% will be replaced with the player's name.
+origin-clear-command-template: "origin clear %player% origin"
+
+# You can add more configurable messages here if you want
+# messages:
+#   cooldown-active: "&cYou are still on cooldown for %time%."
+#   xp-needed: "&cYou need %xp_cost% XP levels. You have %xp_current%."
+#   reset-requested: "&eType /confirmoriginreset to reset your origin for %xp_cost% XP."
+#   reset-confirmed: "&aYour origin has been reset!"
+#   reset-cancelled: "&eOrigin reset cancelled."
+#   cooldown-check: "&eYou can reset your origin in %time%."
+#   cooldown-over: "&aYour origin reset cooldown is over."

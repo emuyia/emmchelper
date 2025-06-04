@@ -20,8 +20,15 @@ import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
 import com.emuyia.emmchelper.commands.RequestCommand;
+import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
+import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
+import com.starshootercity.OriginsAddon;
+import com.starshootercity.abilities.Ability;
+import org.jetbrains.annotations.NotNull;
 
-public class MCHelperPlugin extends JavaPlugin {
+import java.util.List;
+
+public class MCHelperPlugin extends OriginsAddon {
 
     private final Map<UUID, Long> cooldowns = new HashMap<>();
     private final Set<UUID> pendingResets = new HashSet<>();
@@ -41,7 +48,7 @@ public class MCHelperPlugin extends JavaPlugin {
     // ... more messages can be defined here
 
     @Override
-    public void onEnable() {
+    public void onRegister() {
         // Load configuration
         saveDefaultConfig(); // Creates config.yml if it doesn't exist
         loadPluginConfig();
@@ -55,7 +62,7 @@ public class MCHelperPlugin extends JavaPlugin {
         // Load player data (cooldowns)
         loadPlayerData();
 
-        getLogger().info("emMCHelper has been enabled!");
+        getLogger().info("emMCHelper has been enabled and registered with Origins-Reborn!");
     }
 
     @Override
@@ -63,6 +70,20 @@ public class MCHelperPlugin extends JavaPlugin {
         // Save player data (cooldowns)
         savePlayerData();
         getLogger().info("emMCHelper has been disabled!");
+    }
+
+    // Add OriginsAddon required methods
+    @Override
+    public @NotNull String getNamespace() {
+        return "emmchelper"; // Your unique addon namespace
+    }
+
+    @Override
+    public @NotNull List<Ability> getRegisteredAbilities() {
+        return List.of(
+                new ToggleFlyAbility(this),
+                new ToggleInvisibilityAbility(this)
+        );
     }
 
     private void loadPluginConfig() {

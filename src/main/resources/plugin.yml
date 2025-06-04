@@ -4,6 +4,8 @@ main: com.emuyia.emmchelper.MCHelperPlugin # IMPORTANT: Corrected to your actual
 api-version: '1.21' # Set to your target Minecraft version (e.g., 1.19, 1.20, 1.21)
 author: emuyia # Your name or alias
 description: Allows players to reset their origin with a cooldown and XP cost.
+depend: # Add this section
+  - Origins-Reborn
 
 commands:
   requestoriginreset:

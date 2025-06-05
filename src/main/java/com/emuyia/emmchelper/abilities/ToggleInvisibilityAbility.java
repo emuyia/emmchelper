@@ -58,7 +58,7 @@ public class ToggleInvisibilityAbility implements Ability, VisibleAbility, Trigg
 
     @Override
     public @NotNull Trigger getTrigger() {
-        TriggerType defaultTriggerType = TriggerType.SNEAK_TOGGLE;
+        TriggerType defaultTriggerType = TriggerType.DOUBLE_TAP_SNEAK;
 
         TriggerRunner runner = (TriggerManager.TriggerEvent event) -> {
             Player player = event.player();

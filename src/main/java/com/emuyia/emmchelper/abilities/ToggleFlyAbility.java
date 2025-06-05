@@ -58,7 +58,7 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
 
     @Override
     public @NotNull Trigger getTrigger() {
-        TriggerType defaultTriggerType = TriggerType.SNEAK_TOGGLE;
+        TriggerType defaultTriggerType = TriggerType.LEFT_CLICK;
 
         TriggerRunner runner = (TriggerManager.TriggerEvent event) -> {
             Player player = event.player();

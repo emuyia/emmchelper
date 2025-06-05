@@ -1,5 +1,5 @@
 name: EmMCHelper
-version: 1.0.2 # This will be replaced by Maven with the version from pom.xml
+version: 1.0.3 # This will be replaced by Maven with the version from pom.xml
 main: com.emuyia.emmchelper.MCHelperPlugin # IMPORTANT: Corrected to your actual main class path
 api-version: '1.21' # Set to your target Minecraft version (e.g., 1.19, 1.20, 1.21)
 author: emuyia # Your name or alias

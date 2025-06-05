@@ -3,18 +3,16 @@ package com.emuyia.emmchelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit; // Added import
+import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit; // Added import
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor; // Added import
 import org.bukkit.configuration.file.FileConfiguration; // Added import
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
+import org.bukkit.configuration.file.YamlConfiguration; // Added import
+import org.bukkit.entity.Player; // Added import
 import org.jetbrains.annotations.NotNull;
 
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
@@ -33,8 +31,14 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class MCHelperPlugin extends OriginsAddon {
 
+    // Enum to represent the type of reset a player is confirming
+    public enum PendingResetType {
+        FREE_RESET, // Resetting for free after cooldown
+        PAID_RESET_ON_COOLDOWN // Resetting for XP while still on cooldown
+    }
+
     private final Map<UUID, Long> cooldowns = new HashMap<>();
-    private final Set<UUID> pendingResets = new HashSet<>();
+    private final Map<UUID, PendingResetType> pendingResetTypes = new HashMap<>(); // Changed from Set<UUID> pendingResets
 
     private FileConfiguration playerDataConfig = null;
     private File playerDataFile = null;
@@ -92,7 +96,7 @@ public class MCHelperPlugin extends OriginsAddon {
     private void loadPluginConfig() {
         FileConfiguration config = getConfig();
         xpCost = config.getInt("xp-cost", 30);
-        long cooldownSeconds = config.getLong("reset-cooldown-seconds", TimeUnit.DAYS.toSeconds(1));
+        long cooldownSeconds = config.getLong("reset-cooldown-seconds", TimeUnit.DAYS.toSeconds(7));
         resetCooldownMillis = TimeUnit.SECONDS.toMillis(cooldownSeconds);
         originClearCommandTemplate = config.getString("origin-clear-command-template", "origin clear %player% origin");
     }
@@ -121,15 +125,19 @@ public class MCHelperPlugin extends OriginsAddon {
 
     // --- Pending Reset Management ---
     public boolean hasPendingReset(Player player) {
-        return pendingResets.contains(player.getUniqueId());
+        return pendingResetTypes.containsKey(player.getUniqueId());
     }
 
-    public void addPendingReset(Player player) {
-        pendingResets.add(player.getUniqueId());
+    public void addPendingReset(Player player, PendingResetType type) {
+        pendingResetTypes.put(player.getUniqueId(), type);
+    }
+
+    public PendingResetType getPendingResetType(Player player) {
+        return pendingResetTypes.get(player.getUniqueId());
     }
 
     public void removePendingReset(Player player) {
-        pendingResets.remove(player.getUniqueId());
+        pendingResetTypes.remove(player.getUniqueId());
     }
 
     // --- XP Management ---

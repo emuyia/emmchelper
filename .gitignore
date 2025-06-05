@@ -42,3 +42,4 @@ Origins-Reborn-*.jar
 *.lnk
 
 server/*
+target/*

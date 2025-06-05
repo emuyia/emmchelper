@@ -1,0 +1,38 @@
+// .vscode/tasks.json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build, Deploy, and Reload Plugin (via build.sh)",
+            "type": "shell",
+            "command": "./build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$javac"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Run Minecraft Server",
+            "type": "shell",
+            "command": "java",
+            "args": [
+                "-Xms4G",
+                "-Xmx4G",
+                "-jar",
+                "paper.jar",
+                "--nogui"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/server"
+            },
+            "isBackground": true,
+            "problemMatcher": []
+        }
+    ]
+}

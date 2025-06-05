@@ -29,28 +29,24 @@ public class ToggleInvisibilityAbility implements Ability, VisibleAbility, Trigg
         return Key.key(plugin.getNamespace(), "toggle_invisibility");
     }
 
-    // --- VisibleAbility Implementation ---
     @Override
     public @NotNull String title() {
         return "Toggle Invisibility";
     }
 
-    // This method is not overriding anything from Ability or VisibleAbility
     public @NotNull Component getName() {
         return Component.text("Toggle Invisibility").color(NamedTextColor.GRAY);
     }
 
     @Override
-    public @NotNull String description() { // Changed return type to String
+    public @NotNull String description() {
         return "Trigger to toggle invisibility.";
     }
 
-    // This method is not overriding anything from Ability or VisibleAbility
     public @NotNull ItemStack getIcon() {
         return new ItemStack(Material.GLASS_PANE);
     }
 
-    // --- TriggerableAbility Implementation ---
     @Override
     public char getDefaultKeybind() {
         return 'H';
@@ -66,10 +62,8 @@ public class ToggleInvisibilityAbility implements Ability, VisibleAbility, Trigg
 
             if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                 player.removePotionEffect(PotionEffectType.INVISIBILITY);
-                player.sendMessage(MCHelperPlugin.ABILITY_MSG_PREFIX.append(Component.text("You are now visible.").color(NamedTextColor.YELLOW)));
             } else {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, PotionEffect.INFINITE_DURATION, 0, false, false, true));
-                player.sendMessage(MCHelperPlugin.ABILITY_MSG_PREFIX.append(Component.text("You are now invisible.").color(NamedTextColor.GREEN)));
             }
         };
         return Trigger.builder(defaultTriggerType, this)

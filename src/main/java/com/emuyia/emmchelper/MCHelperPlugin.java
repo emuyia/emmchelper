@@ -92,7 +92,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
 
         // Register this class (MCHelperPlugin) as a listener too for the test
         getServer().getPluginManager().registerEvents(this, this);
-        getLogger().info("[MCHelperDEBUG] Registered MCHelperPlugin itself as a listener for testing InventoryOpenEvent.");
+        // getLogger().info("[MCHelperDEBUG] Registered MCHelperPlugin itself as a listener for testing InventoryOpenEvent.");
 
         getLogger().info("emMCHelper has been enabled and registered with Origins-Reborn!");
     }
@@ -268,29 +268,11 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
     // and super.onReload() was causing an error. If reload functionality is needed,
     // it should be implemented based on how OriginsAddon handles reloads or via Bukkit events.
 
-    // Temporary test event handler in MCHelperPlugin
-    @EventHandler(priority = EventPriority.MONITOR) // Use MONITOR to ensure it sees the event even if cancelled
-    public void onAnyInventoryOpenForTest(InventoryOpenEvent event) {
-        if (event.getPlayer() instanceof Player) {
-            Player player = (Player) event.getPlayer();
-            getLogger().info("[MCHelperTEST_INV] InventoryOpenEvent detected in MCHelperPlugin for " + player.getName() + ". Type: " + event.getInventory().getType() + ". Is flying: " + player.isFlying());
-        } else {
-            getLogger().info("[MCHelperTEST_INV] InventoryOpenEvent detected in MCHelperPlugin for non-player: " + event.getPlayer().getName() + ". Type: " + event.getInventory().getType());
-        }
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAnyInventoryClickForTest(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
-            getLogger().info("[MCHelperTEST_CLICK] InventoryClickEvent detected in MCHelperPlugin for " + player.getName() + ". Slot: " + event.getSlot());
+            //getLogger().info("[MCHelperTEST_CLICK] InventoryClickEvent detected in MCHelperPlugin for " + player.getName() + ". Slot: " + event.getSlot());
         }
-    }
-
-    // New test event handler for PlayerJoinEvent
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoinForTest(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        getLogger().info("[MCHelperTEST_JOIN] PlayerJoinEvent detected in MCHelperPlugin for " + player.getName());
     }
 }

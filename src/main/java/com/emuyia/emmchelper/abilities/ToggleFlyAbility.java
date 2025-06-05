@@ -6,9 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler; // For PlayerQuitEvent listener
+import org.bukkit.event.Listener;  // For PlayerQuitEvent listener
+import org.bukkit.event.player.PlayerQuitEvent; // For PlayerQuitEvent listener
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull; // Import the new interface
+import org.jetbrains.annotations.NotNull;
 
 import com.emuyia.emmchelper.MCHelperPlugin;
 import com.starshootercity.abilities.types.Ability;
@@ -17,27 +20,25 @@ import com.starshootercity.abilities.types.TriggerableAbility;
 import com.starshootercity.abilities.types.VisibleAbility;
 import com.starshootercity.util.TriggerManager;
 
-import net.kyori.adventure.key.Key; // Import TriState
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 
-// Implement FlightAllowingAbility
 public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbility, FlightAllowingAbility {
     private final MCHelperPlugin plugin;
-    // Map to store the flight state for each player, managed by this ability
     private final Map<UUID, Boolean> playerFlightToggleState = new ConcurrentHashMap<>();
+    private static final float DEFAULT_FLY_SPEED = 0.1f; // Bukkit's default
 
     public ToggleFlyAbility(MCHelperPlugin plugin) {
         this.plugin = plugin;
-        // Consider adding a PlayerQuitEvent listener here to clean up the map
-        // For example: plugin.getServer().getPluginManager().registerEvents(new Listener() {
-        //     @EventHandler
-        //     public void onPlayerQuit(PlayerQuitEvent event) {
-        //         playerFlightToggleState.remove(event.getPlayer().getUniqueId());
-        //     }
-        // }, plugin);
-        // This is important for long-term server stability to prevent memory leaks.
+        // Listener to clean up the map on player quit
+        this.plugin.getServer().getPluginManager().registerEvents(new Listener() {
+            @EventHandler
+            public void onPlayerQuit(PlayerQuitEvent event) {
+                playerFlightToggleState.remove(event.getPlayer().getUniqueId());
+            }
+        }, plugin);
     }
 
     @Override
@@ -72,8 +73,6 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
 
     @Override
     public boolean canFly(Player player) {
-        // If this ability has toggled flight ON for the player, they can fly.
-        // Otherwise, this ability doesn't grant flight permission via this method.
         boolean canFly = playerFlightToggleState.getOrDefault(player.getUniqueId(), false);
         // plugin.getLogger().info("[ToggleFlyAbility][FlightAllowingAbility] canFly for " + player.getName() + ": " + canFly);
         return canFly;
@@ -81,42 +80,32 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
 
     @Override
     public float getFlightSpeed(Player player) {
-        // Return a default flight speed. You could make this configurable.
-        // player.getFlySpeed() returns the player's current fly speed, which is a good default.
-        return player.getFlySpeed(); // Bukkit's default is 0.1f
+        // If this ability allows flight, return our defined speed.
+        // Otherwise, let other abilities or defaults handle it (though Origins might just use the player's current speed).
+        // plugin.getLogger().info("[ToggleFlyAbility][FlightAllowingAbility] getFlightSpeed for " + player.getName() + " returning " + DEFAULT_FLY_SPEED);
+        return DEFAULT_FLY_SPEED;
     }
 
     @Override
     public boolean forceFly(Player player) {
-        // This method's role in Origins-Reborn needs to be fully understood.
-        // If Origins calls this to *make* a player fly when canFly() is true,
-        // then player.setFlying(true) could go here.
-        // However, our trigger already handles player.setFlying().
-        // Let's assume for now that Origins uses canFly() to manage player.setAllowFlight(),
-        // and our trigger handles the direct player.setFlying().
-        // If returning true here makes Origins call setFlying(true), it might be beneficial.
-        // For now, returning false to avoid potential double-calls or conflicts with the trigger.
-        // plugin.getLogger().info("[ToggleFlyAbility][FlightAllowingAbility] forceFly for " + player.getName() + " called.");
-        return false;
+        // If this ability intends for the player to fly, signal that flight should be forced.
+        // Origins-Reborn might use this to ensure setFlying(true) is called or maintained.
+        boolean shouldForce = canFly(player);
+        // plugin.getLogger().info("[ToggleFlyAbility][FlightAllowingAbility] forceFly for " + player.getName() + " called. Returning: " + shouldForce);
+        return shouldForce;
     }
 
     @Override
     public @NotNull TriState getFlyingFallDamage(Player player) {
-        // If this ability grants flight, it should probably negate fall damage while it's active.
-        // However, to keep it simple and avoid conflicts, TriState.NOT_SET lets Origins or other systems decide.
-        // If flight is active due to this ability, negating fall damage makes sense.
         if (canFly(player)) {
-            return TriState.FALSE; // No fall damage if this ability allows flight
+            return TriState.FALSE;
         }
-        return TriState.NOT_SET; // Let other abilities/systems decide
+        return TriState.NOT_SET;
     }
 
     @Override
     public int getPriority() {
-        // Set a priority. Higher numbers are often higher priority.
-        // If this ability should strongly dictate flight, give it a higher priority.
-        // If it's a supplementary flight, a lower one. Defaulting to 1 as in the interface.
-        return 10; // Example: Give it a moderate to high priority
+        return 10;
     }
 
     // --- TriggerableAbility Implementation ---
@@ -147,12 +136,13 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
                 plugin.getLogger().info("[ToggleFlyAbility] Enabling flight for " + player.getName());
                 if (!player.isOnline()) {
                     plugin.getLogger().warning("[ToggleFlyAbility] Action for " + player.getName() + " aborted as player offline.");
-                    playerFlightToggleState.remove(player.getUniqueId()); // Clean up state
+                    playerFlightToggleState.remove(player.getUniqueId());
                     return;
                 }
 
-                player.setAllowFlight(true); // Explicitly set, Origins should now respect this due to canFly()
-                plugin.getLogger().info("[ToggleFlyAbility] After setAllowFlight(true): player.getAllowFlight() = " + player.getAllowFlight());
+                player.setAllowFlight(true);
+                player.setFlySpeed(DEFAULT_FLY_SPEED); // Explicitly set fly speed
+                plugin.getLogger().info("[ToggleFlyAbility] After setAllowFlight(true) and setFlySpeed(" + DEFAULT_FLY_SPEED + "): player.getAllowFlight() = " + player.getAllowFlight() + ", player.getFlySpeed() = " + player.getFlySpeed());
 
                 if (player.isOnGround()) {
                     player.setVelocity(player.getVelocity().add(new Vector(0, 0.1, 0)));
@@ -173,14 +163,14 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
             } else { // Intending to DISABLE flight
                 plugin.getLogger().info("[ToggleFlyAbility] Disabling flight for " + player.getName());
                 player.setFlying(false);
-                player.setAllowFlight(false); // Revoke permission
-                playerFlightToggleState.put(player.getUniqueId(), false); // Ensure state is false
+                player.setAllowFlight(false);
+                player.setFlySpeed(DEFAULT_FLY_SPEED); // Reset fly speed to default
+                playerFlightToggleState.put(player.getUniqueId(), false);
                 player.sendMessage(MCHelperPlugin.ABILITY_MSG_PREFIX.append(Component.text("Flight disabled by ability.").color(NamedTextColor.YELLOW)));
                 plugin.getLogger().info("[ToggleFlyAbility] After disabling: player.getAllowFlight() = " + player.getAllowFlight() + ", player.isFlying() = " + player.isFlying());
             }
-            // It might be necessary to tell Origins to re-evaluate flight abilities for the player here,
-            // if it doesn't do so automatically after an ability state changes.
-            // E.g., if Origins has an API like: OriginsRebornAPI.getAbilityManager().updateAbilities(player);
+            // Consider if Origins-Reborn needs an explicit update call after ability state changes
+            // e.g., if (plugin.getOriginsAPI() != null) plugin.getOriginsAPI().getAbilityManager().updateAbilities(player);
         };
         return Trigger.builder(defaultTriggerType, this)
                 .addConditions(Condition.DUMMY)

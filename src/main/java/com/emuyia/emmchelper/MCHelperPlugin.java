@@ -13,10 +13,17 @@ import org.bukkit.ChatColor; // Added import
 import org.bukkit.configuration.file.FileConfiguration; // Added import
 import org.bukkit.configuration.file.YamlConfiguration; // Added import
 import org.bukkit.entity.Player; // Added import
+import org.bukkit.event.EventHandler; // + Add
+import org.bukkit.event.Listener;    // + Add
+import org.bukkit.event.inventory.InventoryOpenEvent; // + Add
+import org.bukkit.event.inventory.InventoryClickEvent; // + Add
+import org.bukkit.event.EventPriority; // + Add
+import org.bukkit.event.player.PlayerJoinEvent; // + Add
 import org.jetbrains.annotations.NotNull;
 
+import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
-import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
+import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility; // + Import new ability
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -29,7 +36,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class MCHelperPlugin extends OriginsAddon {
+public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add "implements Listener"
 
     // Enum to represent the type of reset a player is confirming
     public enum PendingResetType {
@@ -57,17 +64,35 @@ public class MCHelperPlugin extends OriginsAddon {
             .append(Component.text("MCHelper").color(NamedTextColor.YELLOW))
             .append(Component.text("] ").color(NamedTextColor.GOLD));
 
+    private ToggleFlyAbility toggleFlyAbility;
+    private ToggleInvisibilityAbility toggleInvisibilityAbility;
+    private NoInventoryWhileFlyingAbility noInventoryWhileFlyingAbility; // + Declare new ability instance
+
     @Override
     public void onRegister() { // Changed from onEnable, removed final error
-        saveDefaultConfig();
-        loadPluginConfig(); // For OriginReset feature
+        getLogger().info("MCHelperPlugin registering...");
 
+        // Load configuration first
+        loadPluginConfig();
+        saveDefaultConfig(); // Ensure default config is saved if not present
+        reloadPlayerData(); // Load player data
+
+        // Initialize abilities
+        toggleFlyAbility = new ToggleFlyAbility(this);
+        toggleInvisibilityAbility = new ToggleInvisibilityAbility(this);
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate NoInventoryWhileFlyingAbility...");
+        this.noInventoryWhileFlyingAbility = new NoInventoryWhileFlyingAbility(this);
+        getLogger().info("[MCHelperDEBUG] NoInventoryWhileFlyingAbility instantiation complete.");
+
+        // Register commands
         getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
         getCommand("confirmoriginreset").setExecutor(new ConfirmCommand(this));
         getCommand("canceloriginreset").setExecutor(new CancelCommand(this));
         getCommand("originresetcooldown").setExecutor(new CooldownCheckCommand(this));
 
-        loadPlayerData(); // For OriginReset feature
+        // Register this class (MCHelperPlugin) as a listener too for the test
+        getServer().getPluginManager().registerEvents(this, this);
+        getLogger().info("[MCHelperDEBUG] Registered MCHelperPlugin itself as a listener for testing InventoryOpenEvent.");
 
         getLogger().info("emMCHelper has been enabled and registered with Origins-Reborn!");
     }
@@ -87,9 +112,11 @@ public class MCHelperPlugin extends OriginsAddon {
 
     @Override
     public @NotNull List<Ability> getRegisteredAbilities() { // Kept the first, removed duplicate
+        // Make sure to return all abilities that should be recognized by Origins.
         return List.of(
-                new ToggleFlyAbility(this),
-                new ToggleInvisibilityAbility(this)
+                toggleFlyAbility,
+                toggleInvisibilityAbility,
+                noInventoryWhileFlyingAbility // + Add new ability to the list
         );
     }
 
@@ -240,4 +267,30 @@ public class MCHelperPlugin extends OriginsAddon {
     // The custom onReload method was removed as it wasn't overriding anything from OriginsAddon
     // and super.onReload() was causing an error. If reload functionality is needed,
     // it should be implemented based on how OriginsAddon handles reloads or via Bukkit events.
+
+    // Temporary test event handler in MCHelperPlugin
+    @EventHandler(priority = EventPriority.MONITOR) // Use MONITOR to ensure it sees the event even if cancelled
+    public void onAnyInventoryOpenForTest(InventoryOpenEvent event) {
+        if (event.getPlayer() instanceof Player) {
+            Player player = (Player) event.getPlayer();
+            getLogger().info("[MCHelperTEST_INV] InventoryOpenEvent detected in MCHelperPlugin for " + player.getName() + ". Type: " + event.getInventory().getType() + ". Is flying: " + player.isFlying());
+        } else {
+            getLogger().info("[MCHelperTEST_INV] InventoryOpenEvent detected in MCHelperPlugin for non-player: " + event.getPlayer().getName() + ". Type: " + event.getInventory().getType());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onAnyInventoryClickForTest(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            getLogger().info("[MCHelperTEST_CLICK] InventoryClickEvent detected in MCHelperPlugin for " + player.getName() + ". Slot: " + event.getSlot());
+        }
+    }
+
+    // New test event handler for PlayerJoinEvent
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinForTest(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        getLogger().info("[MCHelperTEST_JOIN] PlayerJoinEvent detected in MCHelperPlugin for " + player.getName());
+    }
 }

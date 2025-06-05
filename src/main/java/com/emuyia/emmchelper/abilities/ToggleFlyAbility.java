@@ -1,24 +1,20 @@
 package com.emuyia.emmchelper.abilities;
 
-import com.emuyia.emmchelper.MCHelperPlugin;
-import com.starshootercity.abilities.Ability;
-import com.starshootercity.abilities.Key;
-import com.starshootercity.abilities.VisibleAbility;
-import com.starshootercity.abilities.TriggerableAbility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
+import com.emuyia.emmchelper.MCHelperPlugin;
+import com.starshootercity.abilities.types.Ability;
+import com.starshootercity.abilities.types.TriggerableAbility;
+import com.starshootercity.abilities.types.VisibleAbility;
+import com.starshootercity.util.TriggerManager;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbility {
     private final MCHelperPlugin plugin;
@@ -32,37 +28,53 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
         return Key.key(plugin.getNamespace(), "toggle_fly");
     }
 
+    // --- VisibleAbility Implementation ---
     @Override
+    public @NotNull String title() {
+        return "Toggle Fly";
+    }
+
+    // This method is not overriding anything from Ability or VisibleAbility
     public @NotNull Component getName() {
         return Component.text("Toggle Fly").color(NamedTextColor.AQUA);
     }
 
     @Override
-    public @NotNull List<Component> getDescription() {
-        return List.of(
-                Component.text("Press your ability key to toggle flight.").color(NamedTextColor.GRAY),
-                Component.text("Requires EssentialsX /fly command.").color(NamedTextColor.DARK_GRAY)
-        );
+    public @NotNull String description() { // Changed return type to String
+        // Combine lines into a single string, use \n for new lines
+        return "Trigger to toggle flight.\nRequires EssentialsX /fly command.";
     }
 
-    @Override
+    // This method is not overriding anything from Ability or VisibleAbility
     public @NotNull ItemStack getIcon() {
         return new ItemStack(Material.FEATHER);
     }
 
+    // --- TriggerableAbility Implementation ---
     @Override
-    public void onTrigger(@NotNull Player player, @NotNull TriggeringReason reason, @Nullable Location location, @Nullable Block block, @Nullable Entity entity, @Nullable ItemStack itemStack) {
-        // Execute the /fly command. Player needs essentials.fly permission.
-        boolean currentFlyState = player.getAllowFlight();
-        Bukkit.dispatchCommand(player, "fly"); // EssentialsX /fly toggles based on current state
+    public char getDefaultKeybind() {
+        return 'G';
+    }
 
-        // Send feedback based on the state *after* the command might have changed it.
-        // It's hard to know the exact outcome of /fly without more EssentialsX integration,
-        // so we assume it toggled successfully.
-        if (!currentFlyState) { // If they couldn't fly before, now they (presumably) can
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + Component.text("Flight enabled.").color(NamedTextColor.GREEN));
-        } else { // If they could fly before, now they (presumably) can't
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + Component.text("Flight disabled.").color(NamedTextColor.YELLOW));
-        }
+    @Override
+    public @NotNull Trigger getTrigger() {
+        TriggerType defaultTriggerType = TriggerType.SNEAK_TOGGLE;
+
+        TriggerRunner runner = (TriggerManager.TriggerEvent event) -> {
+            Player player = event.player();
+            if (player == null) return;
+
+            boolean currentFlyState = player.getAllowFlight();
+            Bukkit.dispatchCommand(player, "fly");
+
+            if (!currentFlyState) {
+                player.sendMessage(MCHelperPlugin.ABILITY_MSG_PREFIX.append(Component.text("Flight enabled.").color(NamedTextColor.GREEN)));
+            } else {
+                player.sendMessage(MCHelperPlugin.ABILITY_MSG_PREFIX.append(Component.text("Flight disabled.").color(NamedTextColor.YELLOW)));
+            }
+        };
+        return Trigger.builder(defaultTriggerType, this)
+                .addConditions(Condition.DUMMY)
+                .build(runner);
     }
 }

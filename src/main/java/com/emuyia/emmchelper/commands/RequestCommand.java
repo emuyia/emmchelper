@@ -31,21 +31,21 @@ public class RequestCommand implements CommandExecutor {
 
         if (plugin.isOnCooldown(player)) {
             long remainingMillis = plugin.getRemainingCooldown(player);
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You are on cooldown. Time remaining: " +
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You are on cooldown. Time remaining: " +
                                TimeFormatter.formatMillis(remainingMillis));
             return true;
         }
 
         if (!plugin.hasEnoughXP(player)) {
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You need " + plugin.xpCost +
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You need " + plugin.xpCost +
                                " XP levels. You have " + player.getLevel() + ".");
             return true;
         }
 
         plugin.addPendingReset(player);
-        player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.YELLOW + "Are you sure you want to reset your origin for " +
+        player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.YELLOW + "Are you sure you want to reset your origin for " +
                            plugin.xpCost + " XP levels?");
-        player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.GREEN + "Type /confirmoriginreset to confirm or /canceloriginreset to cancel.");
+        player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.GREEN + "Type /confirmoriginreset to confirm or /canceloriginreset to cancel.");
         return true;
     }
 }

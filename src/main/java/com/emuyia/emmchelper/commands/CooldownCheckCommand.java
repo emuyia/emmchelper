@@ -31,10 +31,10 @@ public class CooldownCheckCommand implements CommandExecutor {
 
         if (plugin.isOnCooldown(player)) {
             long remainingMillis = plugin.getRemainingCooldown(player);
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.YELLOW + "You can reset your origin again in: " +
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.YELLOW + "You can reset your origin again in: " +
                                TimeFormatter.formatMillis(remainingMillis));
         } else {
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.GREEN + "Your origin reset cooldown is over. You can request a reset now.");
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.GREEN + "Your origin reset cooldown is over. You can request a reset now.");
         }
         return true;
     }

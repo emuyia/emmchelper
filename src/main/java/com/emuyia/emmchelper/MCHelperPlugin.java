@@ -1,32 +1,35 @@
-package com.emuyia.emmchelper; // Match your package
+package com.emuyia.emmchelper;
 
-import java.io.File; // Import your command classes
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit; // Added import
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Bukkit; // Added import
+import org.bukkit.ChatColor; // Added import
+import org.bukkit.configuration.file.FileConfiguration; // Added import
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
+import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
+import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
 import com.emuyia.emmchelper.commands.RequestCommand;
-import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
-import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
 import com.starshootercity.OriginsAddon;
-import com.starshootercity.abilities.Ability;
-import org.jetbrains.annotations.NotNull;
+import com.starshootercity.abilities.types.Ability;
+import com.starshootercity.util.config.ConfigManager;
 
-import java.util.List;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class MCHelperPlugin extends OriginsAddon {
 
@@ -36,50 +39,50 @@ public class MCHelperPlugin extends OriginsAddon {
     private FileConfiguration playerDataConfig = null;
     private File playerDataFile = null;
 
-    // Configurable values
     public int xpCost;
     public long resetCooldownMillis;
     public String originClearCommandTemplate;
 
-    // Message Keys (for potential future localization or easier config)
-    public static final String MSG_PREFIX = ChatColor.GOLD + "[OriginReset] " + ChatColor.RESET;
-    public static final String MSG_NO_PERMISSION = MSG_PREFIX + ChatColor.RED + "You don't have permission to use this command.";
-    public static final String MSG_PLAYER_ONLY = MSG_PREFIX + ChatColor.RED + "This command can only be run by a player.";
-    // ... more messages can be defined here
+    // Prefix for OriginReset commands (using ChatColor for existing command structure)
+    public static final String ORIGIN_RESET_MSG_PREFIX = ChatColor.GOLD + "[OriginReset] " + ChatColor.RESET;
+    public static final String MSG_NO_PERMISSION = ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You don't have permission to use this command.";
+    public static final String MSG_PLAYER_ONLY = ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "This command can only be run by a player.";
+
+    // Prefix for new Ability messages (using Adventure Component)
+    public static final Component ABILITY_MSG_PREFIX = Component.text("[").color(NamedTextColor.GOLD)
+            .append(Component.text("MCHelper").color(NamedTextColor.YELLOW))
+            .append(Component.text("] ").color(NamedTextColor.GOLD));
 
     @Override
-    public void onRegister() {
-        // Load configuration
-        saveDefaultConfig(); // Creates config.yml if it doesn't exist
-        loadPluginConfig();
+    public void onRegister() { // Changed from onEnable, removed final error
+        saveDefaultConfig();
+        loadPluginConfig(); // For OriginReset feature
 
-        // Register commands
-        this.getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
-        this.getCommand("confirmoriginreset").setExecutor(new ConfirmCommand(this));
-        this.getCommand("canceloriginreset").setExecutor(new CancelCommand(this));
-        this.getCommand("originresetcooldown").setExecutor(new CooldownCheckCommand(this));
+        getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
+        getCommand("confirmoriginreset").setExecutor(new ConfirmCommand(this));
+        getCommand("canceloriginreset").setExecutor(new CancelCommand(this));
+        getCommand("originresetcooldown").setExecutor(new CooldownCheckCommand(this));
 
-        // Load player data (cooldowns)
-        loadPlayerData();
+        loadPlayerData(); // For OriginReset feature
 
         getLogger().info("emMCHelper has been enabled and registered with Origins-Reborn!");
     }
 
+    // Removed duplicate onEnable method
+
     @Override
-    public void onDisable() {
-        // Save player data (cooldowns)
+    public void onDisable() { // Kept the first onDisable, removed the duplicate
         savePlayerData();
         getLogger().info("emMCHelper has been disabled!");
     }
 
-    // Add OriginsAddon required methods
     @Override
-    public @NotNull String getNamespace() {
-        return "emmchelper"; // Your unique addon namespace
+    public @NotNull String getNamespace() { // Kept the first, removed duplicate
+        return "emmchelper";
     }
 
     @Override
-    public @NotNull List<Ability> getRegisteredAbilities() {
+    public @NotNull List<Ability> getRegisteredAbilities() { // Kept the first, removed duplicate
         return List.of(
                 new ToggleFlyAbility(this),
                 new ToggleInvisibilityAbility(this)
@@ -89,12 +92,9 @@ public class MCHelperPlugin extends OriginsAddon {
     private void loadPluginConfig() {
         FileConfiguration config = getConfig();
         xpCost = config.getInt("xp-cost", 30);
-        long cooldownSeconds = config.getLong("reset-cooldown-seconds", TimeUnit.DAYS.toSeconds(1)); // Default 1 day
+        long cooldownSeconds = config.getLong("reset-cooldown-seconds", TimeUnit.DAYS.toSeconds(1));
         resetCooldownMillis = TimeUnit.SECONDS.toMillis(cooldownSeconds);
         originClearCommandTemplate = config.getString("origin-clear-command-template", "origin clear %player% origin");
-
-        // You can add more messages here to load from config.yml if desired
-        // e.g., MSG_COOLDOWN_ACTIVE = config.getString("messages.cooldown-active", "Default message...");
     }
 
     // --- Cooldown Management ---
@@ -111,7 +111,7 @@ public class MCHelperPlugin extends OriginsAddon {
 
     public void setCooldown(Player player) {
         cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + resetCooldownMillis);
-        savePlayerData(); // Save immediately or batch saves
+        savePlayerData();
     }
 
     public void removeCooldown(Player player) {
@@ -121,22 +121,15 @@ public class MCHelperPlugin extends OriginsAddon {
 
     // --- Pending Reset Management ---
     public boolean hasPendingReset(Player player) {
-        getLogger().info("Checking pending reset for: " + player.getName() + " (UUID: " + player.getUniqueId() + ")");
-        boolean has = pendingResets.contains(player.getUniqueId());
-        getLogger().info("Player " + player.getName() + " has pending reset: " + has + ". Set size: " + pendingResets.size() + ". Contents: " + pendingResets);
-        return has;
+        return pendingResets.contains(player.getUniqueId());
     }
 
     public void addPendingReset(Player player) {
-        getLogger().info("Attempting to add pending reset for: " + player.getName() + " (UUID: " + player.getUniqueId() + ")");
-        boolean added = pendingResets.add(player.getUniqueId());
-        getLogger().info("Player " + player.getName() + " added to pendingResets: " + added + ". Set size: " + pendingResets.size() + ". Contents: " + pendingResets);
+        pendingResets.add(player.getUniqueId());
     }
 
     public void removePendingReset(Player player) {
-        getLogger().info("Attempting to remove pending reset for: " + player.getName() + " (UUID: " + player.getUniqueId() + ")");
-        boolean removed = pendingResets.remove(player.getUniqueId());
-        getLogger().info("Player " + player.getName() + " removed from pendingResets: " + removed + ". Set size: " + pendingResets.size() + ". Contents: " + pendingResets);
+        pendingResets.remove(player.getUniqueId());
     }
 
     // --- XP Management ---
@@ -155,7 +148,6 @@ public class MCHelperPlugin extends OriginsAddon {
         String commandToExecute = originClearCommandTemplate.replace("%player%", player.getName());
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandToExecute);
     }
-
 
     // --- Player Data Persistence (for cooldowns) ---
     public void reloadPlayerData() {
@@ -177,9 +169,7 @@ public class MCHelperPlugin extends OriginsAddon {
             return;
         }
         try {
-            // Clear existing data in config before saving current map
-            getPlayerData().set("cooldowns", null); // Clear the section
-
+            getPlayerData().set("cooldowns", null);
             for (Map.Entry<UUID, Long> entry : cooldowns.entrySet()) {
                 getPlayerData().set("cooldowns." + entry.getKey().toString(), entry.getValue());
             }
@@ -196,7 +186,7 @@ public class MCHelperPlugin extends OriginsAddon {
                 try {
                     UUID uuid = UUID.fromString(uuidString);
                     long endTime = data.getLong("cooldowns." + uuidString);
-                    if (endTime > System.currentTimeMillis()) { // Only load active cooldowns
+                    if (endTime > System.currentTimeMillis()) {
                         cooldowns.put(uuid, endTime);
                     }
                 } catch (IllegalArgumentException e) {
@@ -206,4 +196,40 @@ public class MCHelperPlugin extends OriginsAddon {
         }
         getLogger().info("Loaded " + cooldowns.size() + " active player cooldowns.");
     }
+
+    // --- Config Helper Methods for Abilities (Now Generic) ---
+    public <T> void registerAbilityConfigOption(Key abilityKey, String path, List<String> description, ConfigManager.SettingType<T> type, T defaultValue) {
+        String fullPath = "abilities." + abilityKey.value() + "." + path;
+        FileConfiguration config = getConfig();
+        if (!config.isSet(fullPath)) {
+            config.set(fullPath, defaultValue); // Bukkit's config should handle various types for T
+        }
+        // Consider calling saveConfig() here or in onDisable/onRegister if defaults are set.
+    }
+
+    @SuppressWarnings("unchecked") // Suppress warning for the cast from Object
+    public <T> T getAbilityConfigOption(Key abilityKey, String path, ConfigManager.SettingType<T> type, T codeDefaultValue) {
+        String fullPath = "abilities." + abilityKey.value() + "." + path;
+        FileConfiguration config = getConfig();
+        Object value = config.get(fullPath);
+
+        if (value == null) {
+            return codeDefaultValue;
+        }
+        try {
+            // This cast assumes that the type T stored in the config is directly castable.
+            // For more complex types or if SettingType<T> implies conversion, this might need more logic.
+            return (T) value;
+        } catch (ClassCastException e) {
+            getLogger().warning("Config value at " + fullPath + " is of wrong type. Expected compatible with " +
+                                (codeDefaultValue != null ? codeDefaultValue.getClass().getName() : "provided type T") +
+                                ", got " + value.getClass().getName() + ". Returning default.");
+            return codeDefaultValue;
+        }
+    }
+
+    // saveDefaultConfig() is called in onRegister.
+    // The custom onReload method was removed as it wasn't overriding anything from OriginsAddon
+    // and super.onReload() was causing an error. If reload functionality is needed,
+    // it should be implemented based on how OriginsAddon handles reloads or via Bukkit events.
 }

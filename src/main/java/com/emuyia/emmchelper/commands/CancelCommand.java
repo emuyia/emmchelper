@@ -30,9 +30,9 @@ public class CancelCommand implements CommandExecutor {
 
         if (plugin.hasPendingReset(player)) {
             plugin.removePendingReset(player);
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.YELLOW + "Origin reset request cancelled.");
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.YELLOW + "Origin reset request cancelled.");
         } else {
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You don't have a pending origin reset to cancel.");
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You don't have a pending origin reset to cancel.");
         }
         return true;
     }

@@ -30,21 +30,21 @@ public class ConfirmCommand implements CommandExecutor {
         }
 
         if (!plugin.hasPendingReset(player)) {
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You don't have a pending origin reset request.");
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You don't have a pending origin reset request.");
             return true;
         }
 
         // Double-check cooldown and XP in case something changed
         if (plugin.isOnCooldown(player)) {
             long remainingMillis = plugin.getRemainingCooldown(player);
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You went on cooldown. Time remaining: " +
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You went on cooldown. Time remaining: " +
                                TimeFormatter.formatMillis(remainingMillis));
             plugin.removePendingReset(player);
             return true;
         }
 
         if (!plugin.hasEnoughXP(player)) {
-            player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.RED + "You no longer have enough XP (" + plugin.xpCost +
+            player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.RED + "You no longer have enough XP (" + plugin.xpCost +
                                " levels). You have " + player.getLevel() + ".");
             plugin.removePendingReset(player);
             return true;
@@ -55,11 +55,11 @@ public class ConfirmCommand implements CommandExecutor {
         plugin.setCooldown(player);
         plugin.removePendingReset(player);
 
-        player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.GREEN + "Your origin has been reset for " +
+        player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.GREEN + "Your origin has been reset for " +
                            plugin.xpCost + " XP levels!");
         long nextAvailable = plugin.getRemainingCooldown(player);
         if (nextAvailable > 0) {
-             player.sendMessage(MCHelperPlugin.MSG_PREFIX + ChatColor.YELLOW + "You can reset again in " + TimeFormatter.formatMillis(nextAvailable) + ".");
+             player.sendMessage(MCHelperPlugin.ORIGIN_RESET_MSG_PREFIX + ChatColor.YELLOW + "You can reset again in " + TimeFormatter.formatMillis(nextAvailable) + ".");
         }
         return true;
     }

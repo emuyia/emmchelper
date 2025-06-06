@@ -5,7 +5,7 @@
 
     <groupId>com.emuyia.emmchelper</groupId> <!-- Change com.yourname -->
     <artifactId>emMCHelper</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <packaging>jar</packaging>
 
     <name>emMCHelper</name>

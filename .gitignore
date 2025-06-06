@@ -43,4 +43,4 @@ Origins-Reborn-*.jar
 
 server/*
 target/*
-Origins-Reborn-*/*
+/Origins-*/*

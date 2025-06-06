@@ -14,34 +14,31 @@ import org.bukkit.configuration.file.FileConfiguration; // Added import
 import org.bukkit.configuration.file.YamlConfiguration; // Added import
 import org.bukkit.entity.Player; // Added import
 import org.bukkit.event.EventHandler; // + Add
-import org.bukkit.event.Listener;    // + Add
-import org.bukkit.event.inventory.InventoryOpenEvent; // + Add
+import org.bukkit.event.EventPriority;    // + Add
+import org.bukkit.event.Listener; // + Add
 import org.bukkit.event.inventory.InventoryClickEvent; // + Add
-import org.bukkit.event.EventPriority; // + Add
-import org.bukkit.event.player.PlayerJoinEvent; // + Add
-import org.bukkit.event.player.PlayerToggleFlightEvent; // + Add this import
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull; // + Add
 
+import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Add
+import com.emuyia.emmchelper.abilities.AerialExhaustionAbility; // + Add this import
+import com.emuyia.emmchelper.abilities.MaxHealthEightHeartsAbility; // + Add this import
+import com.emuyia.emmchelper.abilities.MaxHealthFiveHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthFourHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthNineHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthOneHeartAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthSevenHeartsAbility; // + Import existing ability
+import com.emuyia.emmchelper.abilities.MaxHealthSixHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthThreeHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility;
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
+import com.emuyia.emmchelper.abilities.PlaceGlowLichenAbility;
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
 import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
-import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthOneHeartAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthThreeHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthFourHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthFiveHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthSixHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthSevenHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthEightHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthNineHeartsAbility;
-import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Import new ability
-import com.emuyia.emmchelper.abilities.AerialExhaustionAbility; // + Import new ability
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
-import com.emuyia.emmchelper.commands.RequestCommand;
-import com.starshootercity.OriginsAddon;
+import com.emuyia.emmchelper.commands.RequestCommand; // + Import new ability
+import com.starshootercity.OriginsAddon; // + Import new ability
 import com.starshootercity.abilities.types.Ability;
 import com.starshootercity.util.config.ConfigManager;
 
@@ -82,6 +79,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private NoInventoryWhileFlyingAbility noInventoryWhileFlyingAbility;
     private AerialAffinityAbility aerialAffinityAbility; // + Declare new ability instance
     private AerialExhaustionAbility aerialExhaustionAbility; // + Declare new ability instance
+    private PlaceGlowLichenAbility placeGlowLichenAbility; // + Declare new ability instance
 
     // + Declare fields for new health abilities
     private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
@@ -117,6 +115,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialExhaustionAbility..."); // + Instantiate
         this.aerialExhaustionAbility = new AerialExhaustionAbility(this, this.toggleFlyAbility);                      // + Instantiate
         getLogger().info("[MCHelperDEBUG] AerialExhaustionAbility instantiation complete.");   // + Instantiate
+
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlaceGlowLichenAbility..."); // + Instantiate
+        this.placeGlowLichenAbility = new PlaceGlowLichenAbility(this);                      // + Instantiate
+        getLogger().info("[MCHelperDEBUG] PlaceGlowLichenAbility instantiation complete.");   // + Instantiate
 
         // + Instantiate new health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
@@ -175,6 +177,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 noInventoryWhileFlyingAbility,
                 aerialAffinityAbility,
                 aerialExhaustionAbility,
+                placeGlowLichenAbility, // + Add new ability to the list
                 // + Add new health abilities to the list
                 maxHealthOneHeartAbility,
                 maxHealthTwoHeartsAbility,

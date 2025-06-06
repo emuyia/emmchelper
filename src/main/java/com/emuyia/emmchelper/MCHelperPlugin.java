@@ -27,6 +27,7 @@ import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
 import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
 import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Import new ability
+import com.emuyia.emmchelper.abilities.AerialExhaustionAbility; // + Import new ability
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -71,6 +72,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private ToggleInvisibilityAbility toggleInvisibilityAbility;
     private NoInventoryWhileFlyingAbility noInventoryWhileFlyingAbility;
     private AerialAffinityAbility aerialAffinityAbility; // + Declare new ability instance
+    private AerialExhaustionAbility aerialExhaustionAbility; // + Declare new ability instance
 
     @Override
     public void onRegister() { // Changed from onEnable, removed final error
@@ -91,6 +93,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialAffinityAbility..."); // + Instantiate
         this.aerialAffinityAbility = new AerialAffinityAbility(this);                        // + Instantiate
         getLogger().info("[MCHelperDEBUG] AerialAffinityAbility instantiation complete.");  // + Instantiate
+
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialExhaustionAbility..."); // + Instantiate
+        this.aerialExhaustionAbility = new AerialExhaustionAbility(this, this.toggleFlyAbility);                      // + Instantiate
+        getLogger().info("[MCHelperDEBUG] AerialExhaustionAbility instantiation complete.");   // + Instantiate
 
         // Register commands
         getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
@@ -114,6 +120,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
             aerialAffinityAbility.cancelEffectTask();
             getLogger().info("AerialAffinityAbility task cancelled.");
         }
+        if (aerialExhaustionAbility != null) { // + Add block to cancel new task
+            aerialExhaustionAbility.cancelHungerTask();
+            getLogger().info("AerialExhaustionAbility task cancelled.");
+        }
         savePlayerData();
         getLogger().info("emMCHelper has been disabled!");
     }
@@ -130,7 +140,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 toggleFlyAbility,
                 toggleInvisibilityAbility,
                 noInventoryWhileFlyingAbility,
-                aerialAffinityAbility // + Add new ability to the list
+                aerialAffinityAbility,
+                aerialExhaustionAbility // + Add new ability to the list
         );
     }
 

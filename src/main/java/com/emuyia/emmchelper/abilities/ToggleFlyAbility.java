@@ -109,33 +109,35 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
             }
 
             boolean currentToggleState = playerFlightToggleState.getOrDefault(player.getUniqueId(), false);
-            boolean newToggleState = !currentToggleState;
-            playerFlightToggleState.put(player.getUniqueId(), newToggleState);
-
-            if (newToggleState) {
-                if (!player.isOnline()) {
-                    playerFlightToggleState.remove(player.getUniqueId());
-                    return;
-                }
-
-                player.setAllowFlight(true);
-                player.setFlySpeed(DEFAULT_FLY_SPEED);
-
-                if (player.isOnGround()) {
-                    player.setVelocity(player.getVelocity().add(new Vector(0, 0.1, 0)));
-                }
-
-                player.setFlying(true);
-
-            } else {
-                player.setFlying(false);
-                player.setAllowFlight(false);
-                player.setFlySpeed(DEFAULT_FLY_SPEED);
-                playerFlightToggleState.put(player.getUniqueId(), false);
-            }
+            forceSetPlayerFlightState(player, !currentToggleState);
         };
         return Trigger.builder(defaultTriggerType, this)
                 .addConditions(Condition.EMPTY_HAND, Condition.NO_BLOCK)
                 .build(runner);
+    }
+
+    /**
+     * Sets the flight state for a player, updating both Bukkit API and internal tracking.
+     * This method can be called internally by the trigger or externally by other abilities.
+     * @param player The player whose flight state is to be changed.
+     * @param enableFlight True to enable flight, false to disable.
+     */
+    public void forceSetPlayerFlightState(Player player, boolean enableFlight) {
+        if (!player.isOnline()) {
+            playerFlightToggleState.remove(player.getUniqueId());
+            return;
+        }
+
+        playerFlightToggleState.put(player.getUniqueId(), enableFlight);
+
+        if (enableFlight) {
+            player.setAllowFlight(true);
+            player.setFlySpeed(DEFAULT_FLY_SPEED);
+            player.setFlying(true);
+        } else {
+            player.setFlying(false);
+            player.setAllowFlight(false);
+            player.setFlySpeed(DEFAULT_FLY_SPEED);
+        }
     }
 }

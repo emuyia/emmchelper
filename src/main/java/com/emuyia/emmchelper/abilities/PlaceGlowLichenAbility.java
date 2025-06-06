@@ -85,7 +85,11 @@ public class PlaceGlowLichenAbility implements VisibleAbility, Listener {
             Block clickedBlock = event.getClickedBlock();
             BlockFace clickedFace = event.getBlockFace();
 
-            if (clickedBlock.getType().isAir() || !clickedBlock.getType().isSolid() || clickedBlock.getType().isInteractable()) {
+            if (clickedBlock.getType().isAir() ||
+                !clickedBlock.getType().isSolid() ||
+                clickedBlock.getType().isInteractable() ||
+                clickedBlock.getType() == Material.SCULK_VEIN ||
+                clickedBlock.getType() == Material.GLOW_LICHEN) {
                 return;
             }
 

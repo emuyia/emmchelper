@@ -41,6 +41,7 @@ import com.emuyia.emmchelper.abilities.GoldCopperConverterAbility; // + Import G
 import com.emuyia.emmchelper.abilities.IronCoalConverterAbility;   // + Import IronCoalConverterAbility
 import com.emuyia.emmchelper.abilities.BetterIronArmour; // + Import BetterIronArmour
 import com.emuyia.emmchelper.abilities.BetterIronWeapons; // + Import BetterIronWeapons
+import com.emuyia.emmchelper.abilities.PlacePoppyAbility; // + Import PlacePoppyAbility
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -94,6 +95,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private IronCoalConverterAbility ironCoalConverterAbility;     // + Declare IronCoalConverterAbility
     private BetterIronArmour betterIronArmourAbility; // + Declare BetterIronArmour
     private BetterIronWeapons betterIronWeaponsAbility; // + Declare BetterIronWeapons
+    private PlacePoppyAbility placePoppyAbility; // + Declare PlacePoppyAbility
 
     // + Declare fields for new health abilities
     private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
@@ -177,6 +179,12 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         getServer().getPluginManager().registerEvents(this.betterIronWeaponsAbility, this);
         getLogger().info("[MCHelperDEBUG] BetterIronWeaponsAbility instantiation and listener registration complete.");
 
+        // + Instantiate PlacePoppyAbility
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlacePoppyAbility...");
+        this.placePoppyAbility = new PlacePoppyAbility(this);
+        getServer().getPluginManager().registerEvents(this.placePoppyAbility, this);
+        getLogger().info("[MCHelperDEBUG] PlacePoppyAbility instantiation and listener registration complete.");
+
         // + Instantiate new health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
         this.maxHealthOneHeartAbility = new MaxHealthOneHeartAbility(this);
@@ -242,6 +250,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 ironCoalConverterAbility,   // + Add IronCoalConverterAbility to the list
                 betterIronArmourAbility,   // + Add BetterIronArmourAbility
                 betterIronWeaponsAbility,  // + Add BetterIronWeaponsAbility
+                placePoppyAbility, // + Add PlacePoppyAbility to the list
                 // + Add new health abilities to the list
                 maxHealthOneHeartAbility,
                 maxHealthTwoHeartsAbility,

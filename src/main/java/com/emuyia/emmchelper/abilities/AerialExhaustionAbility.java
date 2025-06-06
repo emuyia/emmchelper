@@ -25,8 +25,8 @@ public class AerialExhaustionAbility implements Ability, VisibleAbility, Listene
     private final ToggleFlyAbility toggleFlyAbilityInstance; // + Store ToggleFlyAbility instance
     private static final String DEFAULT_ORIGIN_LAYER = "origin";
 
-    private static final int CHECK_INTERVAL_TICKS = 20;
-    private static final float SATURATION_DEPLETION_PER_INTERVAL = 6.0f; // Adjusted back from 6.0f for example
+    private static final int CHECK_INTERVAL_TICKS = 100;
+    private static final float SATURATION_DEPLETION_PER_INTERVAL = 1.0f; // Adjusted back from 6.0f for example
     private static final int FOOD_DEPLETION_PER_INTERVAL = 1;
 
     private BukkitTask hungerTask;

@@ -26,6 +26,15 @@ import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
 import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthOneHeartAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthThreeHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthFourHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthFiveHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthSixHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthSevenHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthEightHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthNineHeartsAbility;
 import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Import new ability
 import com.emuyia.emmchelper.abilities.AerialExhaustionAbility; // + Import new ability
 import com.emuyia.emmchelper.commands.CancelCommand;
@@ -74,6 +83,17 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private AerialAffinityAbility aerialAffinityAbility; // + Declare new ability instance
     private AerialExhaustionAbility aerialExhaustionAbility; // + Declare new ability instance
 
+    // + Declare fields for new health abilities
+    private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
+    private MaxHealthTwoHeartsAbility maxHealthTwoHeartsAbility;
+    private MaxHealthThreeHeartsAbility maxHealthThreeHeartsAbility;
+    private MaxHealthFourHeartsAbility maxHealthFourHeartsAbility;
+    private MaxHealthFiveHeartsAbility maxHealthFiveHeartsAbility;
+    private MaxHealthSixHeartsAbility maxHealthSixHeartsAbility;
+    private MaxHealthSevenHeartsAbility maxHealthSevenHeartsAbility;
+    private MaxHealthEightHeartsAbility maxHealthEightHeartsAbility;
+    private MaxHealthNineHeartsAbility maxHealthNineHeartsAbility;
+
     @Override
     public void onRegister() { // Changed from onEnable, removed final error
         getLogger().info("MCHelperPlugin registering...");
@@ -97,6 +117,19 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialExhaustionAbility..."); // + Instantiate
         this.aerialExhaustionAbility = new AerialExhaustionAbility(this, this.toggleFlyAbility);                      // + Instantiate
         getLogger().info("[MCHelperDEBUG] AerialExhaustionAbility instantiation complete.");   // + Instantiate
+
+        // + Instantiate new health abilities
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
+        this.maxHealthOneHeartAbility = new MaxHealthOneHeartAbility(this);
+        this.maxHealthTwoHeartsAbility = new MaxHealthTwoHeartsAbility(this);
+        this.maxHealthThreeHeartsAbility = new MaxHealthThreeHeartsAbility(this);
+        this.maxHealthFourHeartsAbility = new MaxHealthFourHeartsAbility(this);
+        this.maxHealthFiveHeartsAbility = new MaxHealthFiveHeartsAbility(this);
+        this.maxHealthSixHeartsAbility = new MaxHealthSixHeartsAbility(this);
+        this.maxHealthSevenHeartsAbility = new MaxHealthSevenHeartsAbility(this);
+        this.maxHealthEightHeartsAbility = new MaxHealthEightHeartsAbility(this);
+        this.maxHealthNineHeartsAbility = new MaxHealthNineHeartsAbility(this);
+        getLogger().info("[MCHelperDEBUG] Max Health abilities instantiation complete.");
 
         // Register commands
         getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
@@ -141,7 +174,17 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 toggleInvisibilityAbility,
                 noInventoryWhileFlyingAbility,
                 aerialAffinityAbility,
-                aerialExhaustionAbility // + Add new ability to the list
+                aerialExhaustionAbility,
+                // + Add new health abilities to the list
+                maxHealthOneHeartAbility,
+                maxHealthTwoHeartsAbility,
+                maxHealthThreeHeartsAbility,
+                maxHealthFourHeartsAbility,
+                maxHealthFiveHeartsAbility,
+                maxHealthSixHeartsAbility,
+                maxHealthSevenHeartsAbility,
+                maxHealthEightHeartsAbility,
+                maxHealthNineHeartsAbility
         );
     }
 

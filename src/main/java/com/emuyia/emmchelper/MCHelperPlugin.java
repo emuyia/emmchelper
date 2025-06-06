@@ -19,11 +19,14 @@ import org.bukkit.event.inventory.InventoryOpenEvent; // + Add
 import org.bukkit.event.inventory.InventoryClickEvent; // + Add
 import org.bukkit.event.EventPriority; // + Add
 import org.bukkit.event.player.PlayerJoinEvent; // + Add
+import org.bukkit.event.player.PlayerToggleFlightEvent; // + Add this import
 import org.jetbrains.annotations.NotNull;
 
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
-import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility; // + Import new ability
+import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
+import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
+import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Import new ability
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -36,7 +39,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add "implements Listener"
+public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure Listener is implemented if you kept the test handlers
 
     // Enum to represent the type of reset a player is confirming
     public enum PendingResetType {
@@ -66,7 +69,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
 
     private ToggleFlyAbility toggleFlyAbility;
     private ToggleInvisibilityAbility toggleInvisibilityAbility;
-    private NoInventoryWhileFlyingAbility noInventoryWhileFlyingAbility; // + Declare new ability instance
+    private NoInventoryWhileFlyingAbility noInventoryWhileFlyingAbility;
+    private AerialAffinityAbility aerialAffinityAbility; // + Declare new ability instance
 
     @Override
     public void onRegister() { // Changed from onEnable, removed final error
@@ -83,6 +87,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate NoInventoryWhileFlyingAbility...");
         this.noInventoryWhileFlyingAbility = new NoInventoryWhileFlyingAbility(this);
         getLogger().info("[MCHelperDEBUG] NoInventoryWhileFlyingAbility instantiation complete.");
+
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialAffinityAbility..."); // + Instantiate
+        this.aerialAffinityAbility = new AerialAffinityAbility(this);                        // + Instantiate
+        getLogger().info("[MCHelperDEBUG] AerialAffinityAbility instantiation complete.");  // + Instantiate
 
         // Register commands
         getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
@@ -101,6 +109,11 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
 
     @Override
     public void onDisable() { // Kept the first onDisable, removed the duplicate
+        getLogger().info("emMCHelper disabling...");
+        if (aerialAffinityAbility != null) {
+            aerialAffinityAbility.cancelEffectTask();
+            getLogger().info("AerialAffinityAbility task cancelled.");
+        }
         savePlayerData();
         getLogger().info("emMCHelper has been disabled!");
     }
@@ -116,7 +129,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // + Add 
         return List.of(
                 toggleFlyAbility,
                 toggleInvisibilityAbility,
-                noInventoryWhileFlyingAbility // + Add new ability to the list
+                noInventoryWhileFlyingAbility,
+                aerialAffinityAbility // + Add new ability to the list
         );
     }
 

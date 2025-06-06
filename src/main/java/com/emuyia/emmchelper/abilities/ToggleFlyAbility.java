@@ -98,7 +98,7 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
 
     @Override
     public @NotNull Trigger getTrigger() {
-        TriggerType defaultTriggerType = TriggerType.RIGHT_CLICK;
+        TriggerType defaultTriggerType = TriggerType.LEFT_CLICK;
 
         TriggerRunner runner = (TriggerManager.TriggerEvent event) -> {
             Player player = event.player();
@@ -135,7 +135,7 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
             }
         };
         return Trigger.builder(defaultTriggerType, this)
-                .addConditions(Condition.DUMMY)
+                .addConditions(Condition.EMPTY_HAND, Condition.NO_BLOCK)
                 .build(runner);
     }
 }

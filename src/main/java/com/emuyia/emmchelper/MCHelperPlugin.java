@@ -35,6 +35,10 @@ import com.emuyia.emmchelper.abilities.PlaceGlowLichenAbility;
 import com.emuyia.emmchelper.abilities.PlaceSculkVeinAbility; // + Import the new Sculk Vein ability
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
 import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
+import com.emuyia.emmchelper.abilities.EmeraldDiamondConverterAbility; // + Add new import
+import com.emuyia.emmchelper.abilities.LapisRedstoneConverterAbility;
+import com.emuyia.emmchelper.abilities.GoldCopperConverterAbility; // + Import GoldCopperConverterAbility
+import com.emuyia.emmchelper.abilities.IronCoalConverterAbility;   // + Import IronCoalConverterAbility
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -82,6 +86,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private AerialExhaustionAbility aerialExhaustionAbility; // + Declare new ability instance
     private PlaceGlowLichenAbility placeGlowLichenAbility; // + Declare new ability instance
     private PlaceSculkVeinAbility placeSculkVeinAbility; // + Declare field for the new Sculk Vein ability
+    private EmeraldDiamondConverterAbility emeraldDiamondConverterAbility; // + Declare new ability
+    private LapisRedstoneConverterAbility lapisRedstoneConverterAbility; // + Declare LapisRedstoneConverterAbility
+    private GoldCopperConverterAbility goldCopperConverterAbility; // + Declare GoldCopperConverterAbility
+    private IronCoalConverterAbility ironCoalConverterAbility;     // + Declare IronCoalConverterAbility
 
     // + Declare fields for new health abilities
     private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
@@ -128,6 +136,29 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         this.placeSculkVeinAbility = new PlaceSculkVeinAbility(this);
         getServer().getPluginManager().registerEvents(this.placeSculkVeinAbility, this); // Register Sculk Vein listener
         getLogger().info("[MCHelperDEBUG] PlaceSculkVeinAbility instantiation and listener registration complete.");
+
+        // + Instantiate new converter abilities
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate EmeraldDiamondConverterAbility...");
+        this.emeraldDiamondConverterAbility = new EmeraldDiamondConverterAbility(); // + Instantiate new ability
+        getServer().getPluginManager().registerEvents(this.emeraldDiamondConverterAbility, this); // + Register listener
+        getLogger().info("[MCHelperDEBUG] EmeraldDiamondConverterAbility instantiation and listener registration complete.");
+
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate LapisRedstoneConverterAbility...");
+        this.lapisRedstoneConverterAbility = new LapisRedstoneConverterAbility();
+        getServer().getPluginManager().registerEvents(this.lapisRedstoneConverterAbility, this);
+        getLogger().info("[MCHelperDEBUG] LapisRedstoneConverterAbility instantiation and listener registration complete.");
+
+        // + Instantiate new GoldCopperConverterAbility
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate GoldCopperConverterAbility...");
+        this.goldCopperConverterAbility = new GoldCopperConverterAbility();
+        getServer().getPluginManager().registerEvents(this.goldCopperConverterAbility, this);
+        getLogger().info("[MCHelperDEBUG] GoldCopperConverterAbility instantiation and listener registration complete.");
+
+        // + Instantiate new IronCoalConverterAbility
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate IronCoalConverterAbility...");
+        this.ironCoalConverterAbility = new IronCoalConverterAbility();
+        getServer().getPluginManager().registerEvents(this.ironCoalConverterAbility, this);
+        getLogger().info("[MCHelperDEBUG] IronCoalConverterAbility instantiation and listener registration complete.");
 
         // + Instantiate new health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
@@ -188,6 +219,10 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 aerialExhaustionAbility,
                 placeGlowLichenAbility,
                 placeSculkVeinAbility, // + Add the new Sculk Vein ability to the list
+                emeraldDiamondConverterAbility, // + Add EmeraldIronConverterAbility to the list
+                lapisRedstoneConverterAbility, // + Add LapisRedstoneConverterAbility to the list
+                goldCopperConverterAbility, // + Add GoldCopperConverterAbility to the list
+                ironCoalConverterAbility,   // + Add IronCoalConverterAbility to the list
                 // + Add new health abilities to the list
                 maxHealthOneHeartAbility,
                 maxHealthTwoHeartsAbility,

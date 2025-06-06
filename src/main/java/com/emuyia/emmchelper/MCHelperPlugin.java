@@ -32,6 +32,7 @@ import com.emuyia.emmchelper.abilities.MaxHealthThreeHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility;
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
 import com.emuyia.emmchelper.abilities.PlaceGlowLichenAbility;
+import com.emuyia.emmchelper.abilities.PlaceSculkVeinAbility; // + Import the new Sculk Vein ability
 import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
 import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
 import com.emuyia.emmchelper.commands.CancelCommand;
@@ -80,6 +81,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private AerialAffinityAbility aerialAffinityAbility; // + Declare new ability instance
     private AerialExhaustionAbility aerialExhaustionAbility; // + Declare new ability instance
     private PlaceGlowLichenAbility placeGlowLichenAbility; // + Declare new ability instance
+    private PlaceSculkVeinAbility placeSculkVeinAbility; // + Declare field for the new Sculk Vein ability
 
     // + Declare fields for new health abilities
     private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
@@ -118,7 +120,14 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
 
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlaceGlowLichenAbility..."); // + Instantiate
         this.placeGlowLichenAbility = new PlaceGlowLichenAbility(this);                      // + Instantiate
-        getLogger().info("[MCHelperDEBUG] PlaceGlowLichenAbility instantiation complete.");   // + Instantiate
+        getServer().getPluginManager().registerEvents(this.placeGlowLichenAbility, this); // Register Glow Lichen listener
+        getLogger().info("[MCHelperDEBUG] PlaceGlowLichenAbility instantiation and listener registration complete.");   // + Instantiate
+
+        // + Instantiate and register the new Sculk Vein ability
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlaceSculkVeinAbility...");
+        this.placeSculkVeinAbility = new PlaceSculkVeinAbility(this);
+        getServer().getPluginManager().registerEvents(this.placeSculkVeinAbility, this); // Register Sculk Vein listener
+        getLogger().info("[MCHelperDEBUG] PlaceSculkVeinAbility instantiation and listener registration complete.");
 
         // + Instantiate new health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
@@ -177,7 +186,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 noInventoryWhileFlyingAbility,
                 aerialAffinityAbility,
                 aerialExhaustionAbility,
-                placeGlowLichenAbility, // + Add new ability to the list
+                placeGlowLichenAbility,
+                placeSculkVeinAbility, // + Add the new Sculk Vein ability to the list
                 // + Add new health abilities to the list
                 maxHealthOneHeartAbility,
                 maxHealthTwoHeartsAbility,

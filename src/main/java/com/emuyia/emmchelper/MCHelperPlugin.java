@@ -39,6 +39,8 @@ import com.emuyia.emmchelper.abilities.EmeraldDiamondConverterAbility; // + Add 
 import com.emuyia.emmchelper.abilities.LapisRedstoneConverterAbility;
 import com.emuyia.emmchelper.abilities.GoldCopperConverterAbility; // + Import GoldCopperConverterAbility
 import com.emuyia.emmchelper.abilities.IronCoalConverterAbility;   // + Import IronCoalConverterAbility
+import com.emuyia.emmchelper.abilities.BetterIronArmour; // + Import BetterIronArmour
+import com.emuyia.emmchelper.abilities.BetterIronWeapons; // + Import BetterIronWeapons
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -90,6 +92,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private LapisRedstoneConverterAbility lapisRedstoneConverterAbility; // + Declare LapisRedstoneConverterAbility
     private GoldCopperConverterAbility goldCopperConverterAbility; // + Declare GoldCopperConverterAbility
     private IronCoalConverterAbility ironCoalConverterAbility;     // + Declare IronCoalConverterAbility
+    private BetterIronArmour betterIronArmourAbility; // + Declare BetterIronArmour
+    private BetterIronWeapons betterIronWeaponsAbility; // + Declare BetterIronWeapons
 
     // + Declare fields for new health abilities
     private MaxHealthOneHeartAbility maxHealthOneHeartAbility;
@@ -110,6 +114,7 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         loadPluginConfig();
         saveDefaultConfig(); // Ensure default config is saved if not present
         reloadPlayerData(); // Load player data
+        loadPlayerData(); // Ensure player data is loaded after reload/initial load
 
         // Initialize abilities
         toggleFlyAbility = new ToggleFlyAbility(this);
@@ -159,6 +164,18 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         this.ironCoalConverterAbility = new IronCoalConverterAbility();
         getServer().getPluginManager().registerEvents(this.ironCoalConverterAbility, this);
         getLogger().info("[MCHelperDEBUG] IronCoalConverterAbility instantiation and listener registration complete.");
+
+        // + Instantiate BetterIronArmourAbility
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate BetterIronArmourAbility...");
+        this.betterIronArmourAbility = new BetterIronArmour();
+        getServer().getPluginManager().registerEvents(this.betterIronArmourAbility, this);
+        getLogger().info("[MCHelperDEBUG] BetterIronArmourAbility instantiation and listener registration complete.");
+
+        // + Instantiate BetterIronWeaponsAbility
+        getLogger().info("[MCHelperDEBUG] Attempting to instantiate BetterIronWeaponsAbility...");
+        this.betterIronWeaponsAbility = new BetterIronWeapons(this); // Pass plugin instance
+        getServer().getPluginManager().registerEvents(this.betterIronWeaponsAbility, this);
+        getLogger().info("[MCHelperDEBUG] BetterIronWeaponsAbility instantiation and listener registration complete.");
 
         // + Instantiate new health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
@@ -223,6 +240,8 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
                 lapisRedstoneConverterAbility, // + Add LapisRedstoneConverterAbility to the list
                 goldCopperConverterAbility, // + Add GoldCopperConverterAbility to the list
                 ironCoalConverterAbility,   // + Add IronCoalConverterAbility to the list
+                betterIronArmourAbility,   // + Add BetterIronArmourAbility
+                betterIronWeaponsAbility,  // + Add BetterIronWeaponsAbility
                 // + Add new health abilities to the list
                 maxHealthOneHeartAbility,
                 maxHealthTwoHeartsAbility,

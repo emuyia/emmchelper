@@ -153,7 +153,7 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
             forceSetPlayerFlightState(player, !currentToggleState);
         };
         return Trigger.builder(defaultTriggerType, this)
-                .addConditions(Condition.EMPTY_HAND, Condition.NO_BLOCK)
+                .addConditions(Condition.EMPTY_HAND, Condition.NO_BLOCK, Condition.CROUCHING)
                 .build(runner);
     }
 

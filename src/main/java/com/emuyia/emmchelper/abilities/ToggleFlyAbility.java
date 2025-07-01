@@ -1,9 +1,12 @@
 package com.emuyia.emmchelper.abilities;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.emuyia.emmchelper.MCHelperPlugin;
+import com.starshootercity.abilities.types.*; // Import all types
+import com.starshootercity.util.TriggerManager;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -15,19 +18,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import com.emuyia.emmchelper.MCHelperPlugin;
-import com.starshootercity.abilities.types.Ability;
-import com.starshootercity.abilities.types.FlightAllowingAbility;
-import com.starshootercity.abilities.types.TriggerableAbility;
-import com.starshootercity.abilities.types.VisibleAbility;
-import com.starshootercity.util.TriggerManager;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.util.TriState;
-
-public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbility, FlightAllowingAbility, Listener {
+// Add DependencyAbility to the list of interfaces
+public class ToggleFlyAbility implements VisibleAbility, TriggerableAbility, FlightAllowingAbility, DependencyAbility, Listener {
     private final MCHelperPlugin plugin;
     private final Map<UUID, Boolean> playerFlightToggleState = new ConcurrentHashMap<>();
     private static final float BASE_ABILITY_FLY_SPEED = 0.1f;
@@ -41,6 +37,13 @@ public class ToggleFlyAbility implements Ability, VisibleAbility, TriggerableAbi
     public ToggleFlyAbility(MCHelperPlugin plugin) {
         this.plugin = plugin;
         this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    // This is the new required method for DependencyAbility
+    @Override
+    public boolean isEnabled(Player player) {
+        // Return true if the player has flight toggled on from this ability
+        return playerFlightToggleState.getOrDefault(player.getUniqueId(), false);
     }
 
     @EventHandler

@@ -21,27 +21,27 @@ import org.jetbrains.annotations.NotNull; // + Add
 
 import com.emuyia.emmchelper.abilities.AerialAffinityAbility; // + Add
 import com.emuyia.emmchelper.abilities.AerialExhaustionAbility; // + Add this import
-import com.emuyia.emmchelper.abilities.MaxHealthEightHeartsAbility; // + Add this import
+import com.emuyia.emmchelper.abilities.BetterIronArmour; // + Add this import
+import com.emuyia.emmchelper.abilities.BetterIronWeapons;
+import com.emuyia.emmchelper.abilities.EmeraldDiamondConverterAbility;
+import com.emuyia.emmchelper.abilities.GoldCopperConverterAbility;
+import com.emuyia.emmchelper.abilities.IronCoalConverterAbility;
+import com.emuyia.emmchelper.abilities.LapisRedstoneConverterAbility; // + Import existing ability
+import com.emuyia.emmchelper.abilities.MaxHealthEightHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthFiveHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthFourHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthNineHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthOneHeartAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthSevenHeartsAbility; // + Import existing ability
+import com.emuyia.emmchelper.abilities.MaxHealthSevenHeartsAbility; // + Import the new Sculk Vein ability
 import com.emuyia.emmchelper.abilities.MaxHealthSixHeartsAbility;
 import com.emuyia.emmchelper.abilities.MaxHealthThreeHeartsAbility;
-import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility;
+import com.emuyia.emmchelper.abilities.MaxHealthTwoHeartsAbility; // + Add new import
 import com.emuyia.emmchelper.abilities.NoInventoryWhileFlyingAbility;
-import com.emuyia.emmchelper.abilities.PlaceGlowLichenAbility;
-import com.emuyia.emmchelper.abilities.PlaceSculkVeinAbility; // + Import the new Sculk Vein ability
-import com.emuyia.emmchelper.abilities.ToggleFlyAbility;
-import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility;
-import com.emuyia.emmchelper.abilities.EmeraldDiamondConverterAbility; // + Add new import
-import com.emuyia.emmchelper.abilities.LapisRedstoneConverterAbility;
-import com.emuyia.emmchelper.abilities.GoldCopperConverterAbility; // + Import GoldCopperConverterAbility
-import com.emuyia.emmchelper.abilities.IronCoalConverterAbility;   // + Import IronCoalConverterAbility
-import com.emuyia.emmchelper.abilities.BetterIronArmour; // + Import BetterIronArmour
-import com.emuyia.emmchelper.abilities.BetterIronWeapons; // + Import BetterIronWeapons
-import com.emuyia.emmchelper.abilities.PlacePoppyAbility; // + Import PlacePoppyAbility
+import com.emuyia.emmchelper.abilities.PlaceGlowLichenAbility; // + Import GoldCopperConverterAbility
+import com.emuyia.emmchelper.abilities.PlacePoppyAbility;   // + Import IronCoalConverterAbility
+import com.emuyia.emmchelper.abilities.PlaceSculkVeinAbility; // + Import BetterIronArmour
+import com.emuyia.emmchelper.abilities.ToggleFlyAbility; // + Import BetterIronWeapons
+import com.emuyia.emmchelper.abilities.ToggleInvisibilityAbility; // + Import PlacePoppyAbility
 import com.emuyia.emmchelper.commands.CancelCommand;
 import com.emuyia.emmchelper.commands.ConfirmCommand;
 import com.emuyia.emmchelper.commands.CooldownCheckCommand;
@@ -109,83 +109,53 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     private MaxHealthNineHeartsAbility maxHealthNineHeartsAbility;
 
     @Override
-    public void onRegister() { // Changed from onEnable, removed final error
+    public void onRegister() {
         getLogger().info("MCHelperPlugin registering...");
 
         // Load configuration first
         loadPluginConfig();
-        saveDefaultConfig(); // Ensure default config is saved if not present
-        reloadPlayerData(); // Load player data
-        loadPlayerData(); // Ensure player data is loaded after reload/initial load
+        saveDefaultConfig();
+        reloadPlayerData();
+        loadPlayerData();
 
-        // Initialize abilities
-        toggleFlyAbility = new ToggleFlyAbility(this);
-        toggleInvisibilityAbility = new ToggleInvisibilityAbility(this);
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate NoInventoryWhileFlyingAbility...");
-        this.noInventoryWhileFlyingAbility = new NoInventoryWhileFlyingAbility(this);
-        getLogger().info("[MCHelperDEBUG] NoInventoryWhileFlyingAbility instantiation complete.");
+        // Instantiate ToggleFlyAbility first
+        this.toggleFlyAbility = new ToggleFlyAbility(this);
+        // Correct the constructor call here by passing 'this'
+        this.toggleInvisibilityAbility = new ToggleInvisibilityAbility(this);
 
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialAffinityAbility..."); // + Instantiate
-        this.aerialAffinityAbility = new AerialAffinityAbility(this);                        // + Instantiate
-        getLogger().info("[MCHelperDEBUG] AerialAffinityAbility instantiation complete.");  // + Instantiate
+        // Pass the instance to the dependent abilities' constructors
+        this.noInventoryWhileFlyingAbility = new NoInventoryWhileFlyingAbility(this, this.toggleFlyAbility);
+        this.aerialAffinityAbility = new AerialAffinityAbility(this, this.toggleFlyAbility);
+        this.aerialExhaustionAbility = new AerialExhaustionAbility(this, this.toggleFlyAbility);
 
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate AerialExhaustionAbility..."); // + Instantiate
-        this.aerialExhaustionAbility = new AerialExhaustionAbility(this, this.toggleFlyAbility);                      // + Instantiate
-        getLogger().info("[MCHelperDEBUG] AerialExhaustionAbility instantiation complete.");   // + Instantiate
+        this.placeGlowLichenAbility = new PlaceGlowLichenAbility(this);
+        getServer().getPluginManager().registerEvents(this.placeGlowLichenAbility, this);
 
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlaceGlowLichenAbility..."); // + Instantiate
-        this.placeGlowLichenAbility = new PlaceGlowLichenAbility(this);                      // + Instantiate
-        getServer().getPluginManager().registerEvents(this.placeGlowLichenAbility, this); // Register Glow Lichen listener
-        getLogger().info("[MCHelperDEBUG] PlaceGlowLichenAbility instantiation and listener registration complete.");   // + Instantiate
-
-        // + Instantiate and register the new Sculk Vein ability
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlaceSculkVeinAbility...");
         this.placeSculkVeinAbility = new PlaceSculkVeinAbility(this);
-        getServer().getPluginManager().registerEvents(this.placeSculkVeinAbility, this); // Register Sculk Vein listener
-        getLogger().info("[MCHelperDEBUG] PlaceSculkVeinAbility instantiation and listener registration complete.");
+        getServer().getPluginManager().registerEvents(this.placeSculkVeinAbility, this);
 
-        // + Instantiate new converter abilities
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate EmeraldDiamondConverterAbility...");
-        this.emeraldDiamondConverterAbility = new EmeraldDiamondConverterAbility(); // + Instantiate new ability
-        getServer().getPluginManager().registerEvents(this.emeraldDiamondConverterAbility, this); // + Register listener
-        getLogger().info("[MCHelperDEBUG] EmeraldDiamondConverterAbility instantiation and listener registration complete.");
+        this.emeraldDiamondConverterAbility = new EmeraldDiamondConverterAbility();
+        getServer().getPluginManager().registerEvents(this.emeraldDiamondConverterAbility, this);
 
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate LapisRedstoneConverterAbility...");
         this.lapisRedstoneConverterAbility = new LapisRedstoneConverterAbility();
         getServer().getPluginManager().registerEvents(this.lapisRedstoneConverterAbility, this);
-        getLogger().info("[MCHelperDEBUG] LapisRedstoneConverterAbility instantiation and listener registration complete.");
 
-        // + Instantiate new GoldCopperConverterAbility
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate GoldCopperConverterAbility...");
         this.goldCopperConverterAbility = new GoldCopperConverterAbility();
         getServer().getPluginManager().registerEvents(this.goldCopperConverterAbility, this);
-        getLogger().info("[MCHelperDEBUG] GoldCopperConverterAbility instantiation and listener registration complete.");
 
-        // + Instantiate new IronCoalConverterAbility
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate IronCoalConverterAbility...");
         this.ironCoalConverterAbility = new IronCoalConverterAbility();
         getServer().getPluginManager().registerEvents(this.ironCoalConverterAbility, this);
-        getLogger().info("[MCHelperDEBUG] IronCoalConverterAbility instantiation and listener registration complete.");
 
-        // + Instantiate BetterIronArmourAbility
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate BetterIronArmourAbility...");
         this.betterIronArmourAbility = new BetterIronArmour();
         getServer().getPluginManager().registerEvents(this.betterIronArmourAbility, this);
-        getLogger().info("[MCHelperDEBUG] BetterIronArmourAbility instantiation and listener registration complete.");
 
-        // + Instantiate BetterIronWeaponsAbility
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate BetterIronWeaponsAbility...");
-        this.betterIronWeaponsAbility = new BetterIronWeapons(this); // Pass plugin instance
+        this.betterIronWeaponsAbility = new BetterIronWeapons(this);
         getServer().getPluginManager().registerEvents(this.betterIronWeaponsAbility, this);
-        getLogger().info("[MCHelperDEBUG] BetterIronWeaponsAbility instantiation and listener registration complete.");
 
-        // + Instantiate PlacePoppyAbility
-        getLogger().info("[MCHelperDEBUG] Attempting to instantiate PlacePoppyAbility...");
         this.placePoppyAbility = new PlacePoppyAbility(this);
         getServer().getPluginManager().registerEvents(this.placePoppyAbility, this);
-        getLogger().info("[MCHelperDEBUG] PlacePoppyAbility instantiation and listener registration complete.");
 
-        // + Instantiate new health abilities
+        // Instantiate ALL Max Health abilities
         getLogger().info("[MCHelperDEBUG] Attempting to instantiate Max Health abilities...");
         this.maxHealthOneHeartAbility = new MaxHealthOneHeartAbility(this);
         this.maxHealthTwoHeartsAbility = new MaxHealthTwoHeartsAbility(this);
@@ -198,15 +168,14 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
         this.maxHealthNineHeartsAbility = new MaxHealthNineHeartsAbility(this);
         getLogger().info("[MCHelperDEBUG] Max Health abilities instantiation complete.");
 
-        // Register commands
+        // Register commands using the names from plugin.yml
         getCommand("requestoriginreset").setExecutor(new RequestCommand(this));
         getCommand("confirmoriginreset").setExecutor(new ConfirmCommand(this));
         getCommand("canceloriginreset").setExecutor(new CancelCommand(this));
         getCommand("originresetcooldown").setExecutor(new CooldownCheckCommand(this));
 
-        // Register this class (MCHelperPlugin) as a listener too for the test
+        // Register this plugin's listener if it has any @EventHandlers
         getServer().getPluginManager().registerEvents(this, this);
-        // getLogger().info("[MCHelperDEBUG] Registered MCHelperPlugin itself as a listener for testing InventoryOpenEvent.");
 
         getLogger().info("emMCHelper has been enabled and registered with Origins-Reborn!");
     }
@@ -217,15 +186,13 @@ public class MCHelperPlugin extends OriginsAddon implements Listener { // Ensure
     public void onDisable() { // Kept the first onDisable, removed the duplicate
         getLogger().info("emMCHelper disabling...");
         if (aerialAffinityAbility != null) {
-            aerialAffinityAbility.cancelEffectTask();
-            getLogger().info("AerialAffinityAbility task cancelled.");
+            aerialAffinityAbility.cancelTask(); // Corrected method name
         }
-        if (aerialExhaustionAbility != null) { // + Add block to cancel new task
-            aerialExhaustionAbility.cancelHungerTask();
-            getLogger().info("AerialExhaustionAbility task cancelled.");
+        if (aerialExhaustionAbility != null) {
+            aerialExhaustionAbility.cancelTask(); // Corrected method name
         }
         savePlayerData();
-        getLogger().info("emMCHelper has been disabled!");
+        getLogger().info("emMCHelper has been disabled.");
     }
 
     @Override
